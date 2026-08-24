@@ -127,15 +127,15 @@
       padding: 10px;
       font-size: 1rem;
       font-weight: 600;
-      color: var(--text);
-      background: #334155;
-      border: 1px solid #475569;
+      color: #fff;
+      background: var(--button-bg);
+      border: 1px solid var(--button-bg);
       border-radius: 6px;
       cursor: pointer;
       transition: background 0.2s;
     }
 
-    .secondary-btn:hover { background: #475569; }
+    .secondary-btn:hover { background: var(--button-hover); }
 
     .back-btn {
       margin-top: 12px;
@@ -314,9 +314,11 @@
 
   <main class="hidden" id="game-screen">
   <section class="card hidden" id="online-setup">
-    <p style="margin: 0 0 5px 0;">Your username: <b id="my-id" style="color: var(--accent-o);">Not connected</b></p>
+    <p style="margin: 0 0 5px 0;">Your username: <b id="my-id" style="color: var(--accent-o);">Not assigned</b></p>
+    <p style="margin: 0 0 12px 0;">Friend: <b id="friend-status">Not connected</b></p>
 
-    <input type="text" id="join-id" placeholder="Friend's username (optional)">
+    <label for="join-id">Friend's username</label>
+    <input type="text" id="join-id" placeholder="Enter friend's username" autocomplete="off">
     <button class="primary-btn" id="connect-btn">Connect & Play</button>
   </section>
 
@@ -358,6 +360,7 @@
     const cells = document.querySelectorAll('.cell');
     const statusText = document.querySelector('#status');
     const myIdDisplay = document.querySelector('#my-id');
+    const friendStatus = document.querySelector('#friend-status');
     const joinInput = document.querySelector('#join-id');
     const connectBtn = document.querySelector('#connect-btn');
     const restartBtn = document.querySelector('#restartBtn');
@@ -404,6 +407,10 @@
       onlineSetup.classList.toggle('hidden', mode !== 'online');
       restartBtn.disabled = mode === 'online' && !conn;
       if (mode === 'online') onlineRound = 0;
+      if (mode === 'online') {
+        myIdDisplay.textContent = playerName;
+        friendStatus.textContent = 'Not connected';
+      }
       statusText.textContent = mode === 'online' ? `Hi ${playerName}, connect to a friend.` : '';
       resetLocalBoard();
       if (mode === 'ai' && mySymbol === 'O') {
@@ -564,11 +571,13 @@
       conn.on('data', (data) => {
         if (data.type === 'hello') {
           opponentName = data.name;
+          friendStatus.textContent = opponentName;
           statusText.textContent = `${opponentName} joined the game.`;
           showSymbolSelection(onlineRound ? 'online-rematch' : 'online');
         } else if (data.type === 'init') {
           mySymbol = data.joinerSymbol;
           opponentName = data.hostName;
+          friendStatus.textContent = opponentName;
           isOnlineHost = false;
           resetLocalBoard();
           setupGame();
