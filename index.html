@@ -46,6 +46,107 @@
       width: 320px;
     }
 
+    .menu-card { display: grid; gap: 12px; }
+
+    .menu-card h2 { margin: 0 0 4px; font-size: 1.35rem; }
+
+    .menu-card p { margin: 0 0 8px; color: #cbd5e1; font-size: 0.95rem; }
+
+    .hidden { display: none !important; }
+
+    .confirm-btn { margin-top: -2px; }
+
+    .name-row { display: flex; gap: 8px; align-items: center; }
+
+    .name-row input { margin: 10px 0; }
+
+    .name-confirm-btn {
+      flex: 0 0 44px;
+      width: 44px !important;
+      padding: 10px !important;
+      font-size: 1.25rem !important;
+    }
+
+    .username-display {
+      display: block;
+      padding: 10px;
+      color: #ffffff;
+      background: #0f172a;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    #symbol-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .symbol-card { width: min(420px, 100%); }
+
+    .symbol-card h2 { margin-top: 0; }
+
+    .symbol-options { display: flex; gap: 16px; margin: 20px 0; }
+
+    .symbol-option {
+      flex: 1;
+      height: 110px;
+      color: var(--text);
+      background: #334155;
+      border: 3px solid transparent;
+      border-radius: 8px;
+      font-size: 3.5rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .symbol-option.selected { border-color: var(--button-bg); background: #475569; }
+
+    .symbol-option:first-child { color: var(--accent-x); }
+    .symbol-option:last-child { color: var(--accent-o); }
+
+    #game-screen:not(.hidden) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .secondary-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .secondary-btn:hover { background: #475569; }
+
+    .back-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      color: #cbd5e1;
+      background: transparent;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
     .team-select {
       display: flex;
       justify-content: center;
@@ -96,6 +197,8 @@
     button.primary-btn:hover { background-color: var(--button-hover); }
 
     #status {
+      width: 100%;
+      text-align: center;
       font-size: 1.2rem;
       margin-bottom: 15px;
       font-weight: 600;
@@ -131,6 +234,8 @@
 
     #restartBtn {
       margin-top: 25px;
+      margin-left: auto;
+      margin-right: auto;
       padding: 12px 24px;
       font-size: 1rem;
       font-weight: 600;
@@ -144,24 +249,76 @@
 
     #restartBtn:hover { opacity: 0.9; }
     #restartBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    #menuBtn {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 2;
+      width: 44px;
+      height: 44px;
+      margin: 0;
+      padding: 9px;
+      display: grid;
+      align-content: center;
+      gap: 5px;
+      background: var(--card-bg);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+    }
+
+    #menuBtn span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+    }
+
+    #menuBtn:hover { background: #334155; }
   </style>
 </head>
 <body>
 
   <h1>Tic-Tac-Toe</h1>
 
-  <div class="card">
-    <p style="margin: 0 0 5px 0;">Your ID: <b id="my-id" style="color: var(--accent-o);">Connecting...</b></p>
-    
-    <div style="font-size: 0.9rem; margin-top: 10px;">Choose Your Symbol (Host):</div>
-    <div class="team-select">
-      <button class="team-btn selected" id="select-x" onclick="setTeam('X')">X</button>
-      <button class="team-btn" id="select-o" onclick="setTeam('O')">O</button>
+  <section class="card menu-card" id="main-menu">
+    <h2>Choose a game</h2>
+    <button class="username-display hidden" id="username-display" type="button"></button>
+    <p id="welcome-message"></p>
+    <div class="name-row">
+      <input type="text" id="player-name" placeholder="Your username" maxlength="20" autocomplete="nickname">
+      <button class="primary-btn name-confirm-btn" id="confirm-name-btn" aria-label="Confirm username" title="Confirm username">&#10003;</button>
     </div>
+    <button class="primary-btn" id="ai-mode-btn">1v1 AI</button>
+    <button class="secondary-btn" id="local-mode-btn">1v1 Local</button>
+    <button class="secondary-btn" id="online-mode-btn">1v1 Online</button>
+  </section>
 
-    <input type="text" id="join-id" placeholder="Enter Friend's ID to Join">
+  <section class="hidden" id="symbol-modal">
+    <div class="card menu-card symbol-card">
+      <h2>Choose your symbol</h2>
+      <div class="symbol-options">
+        <button class="symbol-option" id="select-x" type="button">X</button>
+        <button class="symbol-option" id="select-o" type="button">O</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card menu-card hidden" id="difficulty-menu">
+    <h2>Choose difficulty</h2>
+    <button class="secondary-btn difficulty-btn" data-difficulty="easy">Easy</button>
+    <button class="secondary-btn difficulty-btn" data-difficulty="medium">Medium</button>
+    <button class="secondary-btn difficulty-btn" data-difficulty="hard">Hard</button>
+    <button class="back-btn" id="difficulty-back-btn">Back</button>
+  </section>
+
+  <main class="hidden" id="game-screen">
+  <section class="card hidden" id="online-setup">
+    <p style="margin: 0 0 5px 0;">Your username: <b id="my-id" style="color: var(--accent-o);">Not connected</b></p>
+
+    <input type="text" id="join-id" placeholder="Friend's username (optional)">
     <button class="primary-btn" id="connect-btn">Connect & Play</button>
-  </div>
+  </section>
 
   <div id="status">Waiting for connection...</div>
 
@@ -178,8 +335,26 @@
   </div>
 
   <button id="restartBtn" disabled>Restart Game</button>
+  <button class="back-btn" id="menuBtn" aria-label="Open main menu" title="Open main menu">
+    <span></span><span></span><span></span>
+  </button>
+  </main>
 
   <script>
+    const mainMenu = document.querySelector('#main-menu');
+    const difficultyMenu = document.querySelector('#difficulty-menu');
+    const gameScreen = document.querySelector('#game-screen');
+    const onlineSetup = document.querySelector('#online-setup');
+    const playerNameInput = document.querySelector('#player-name');
+    const welcomeMessage = document.querySelector('#welcome-message');
+    const confirmNameBtn = document.querySelector('#confirm-name-btn');
+    const usernameDisplay = document.querySelector('#username-display');
+    const symbolModal = document.querySelector('#symbol-modal');
+    const menuBtn = document.querySelector('#menuBtn');
+    const difficultyBackBtn = document.querySelector('#difficulty-back-btn');
+    const aiModeBtn = document.querySelector('#ai-mode-btn');
+    const localModeBtn = document.querySelector('#local-mode-btn');
+    const onlineModeBtn = document.querySelector('#online-mode-btn');
     const cells = document.querySelectorAll('.cell');
     const statusText = document.querySelector('#status');
     const myIdDisplay = document.querySelector('#my-id');
@@ -196,60 +371,206 @@
     let options = ["", "", "", "", "", "", "", "", ""];
     let currentPlayer = "X";
     let mySymbol = "X"; 
+    let peer = null;
     let conn = null;
     let running = false;
+    let gameMode = '';
+    let aiDifficulty = 'easy';
+    let aiTimer = null;
+    let playerName = localStorage.getItem('tttPlayerName') || '';
+    let opponentName = '';
+    let identityConfirmed = Boolean(playerName);
+    let pendingMode = '';
+    let pendingSymbol = 'X';
+    let isOnlineHost = false;
+    let onlineRound = 0;
 
-    // Team Selection for Host
-    function setTeam(symbol) {
-      if (conn) return; // Lock choice once connected
-      mySymbol = symbol;
-      document.getElementById('select-x').classList.toggle('selected', symbol === 'X');
-      document.getElementById('select-o').classList.toggle('selected', symbol === 'O');
+    playerNameInput.value = playerName;
+    confirmNameBtn.disabled = identityConfirmed;
+    [aiModeBtn, localModeBtn, onlineModeBtn].forEach(button => button.disabled = !identityConfirmed);
+    if (playerName) {
+      playerNameInput.classList.add('hidden');
+      usernameDisplay.textContent = playerName;
+      usernameDisplay.classList.remove('hidden');
+      confirmNameBtn.classList.add('hidden');
+      usernameDisplay.textContent = `Hi, ${playerName}`;
     }
 
-    // 1. Peer Connection Initialization
-    const peer = new Peer();
+    function showGame(mode) {
+      gameMode = mode;
+      mainMenu.classList.add('hidden');
+      difficultyMenu.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      onlineSetup.classList.toggle('hidden', mode !== 'online');
+      restartBtn.disabled = mode === 'online' && !conn;
+      if (mode === 'online') onlineRound = 0;
+      statusText.textContent = mode === 'online' ? `Hi ${playerName}, connect to a friend.` : '';
+      resetLocalBoard();
+      if (mode === 'ai' && mySymbol === 'O') {
+        aiTimer = setTimeout(aiMove, 350);
+      }
+    }
 
-    peer.on('open', (id) => {
-      myIdDisplay.textContent = id;
+    confirmNameBtn.addEventListener('click', () => {
+      const namePattern = /^[a-zA-Z0-9_-]{3,20}$/;
+      const enteredName = playerNameInput.value.trim();
+      if (!namePattern.test(enteredName)) {
+        welcomeMessage.textContent = 'Name must be 3-20 letters, numbers, _ or -.';
+        playerNameInput.focus();
+        return;
+      }
+      playerName = enteredName;
+      localStorage.setItem('tttPlayerName', playerName);
+      playerNameInput.value = playerName;
+      playerNameInput.classList.add('hidden');
+      usernameDisplay.textContent = `Hi ${playerName}`;
+      usernameDisplay.classList.remove('hidden');
+      confirmNameBtn.disabled = true;
+      confirmNameBtn.classList.add('hidden');
+      identityConfirmed = true;
+      [aiModeBtn, localModeBtn, onlineModeBtn].forEach(button => button.disabled = false);
+      welcomeMessage.textContent = '';
     });
 
-    // 2. Incoming Connection (Host)
-    peer.on('connection', (connection) => {
-      conn = connection;
-      const joinerSymbol = mySymbol === 'X' ? 'O' : 'X';
-      
-      // Send selected roles to Joiner
-      conn.on('open', () => {
-        conn.send({ type: 'init', hostSymbol: mySymbol, joinerSymbol: joinerSymbol });
-        setupGame();
+    usernameDisplay.addEventListener('click', () => {
+      playerNameInput.classList.remove('hidden');
+      usernameDisplay.classList.add('hidden');
+      playerNameInput.value = playerName;
+      confirmNameBtn.disabled = false;
+      confirmNameBtn.classList.remove('hidden');
+      identityConfirmed = false;
+      [aiModeBtn, localModeBtn, onlineModeBtn].forEach(button => button.disabled = true);
+      playerNameInput.focus();
+    });
+
+    function showSymbolSelection(mode) {
+      pendingMode = mode;
+      pendingSymbol = mode === 'online-rematch' ? (mySymbol === 'X' ? 'O' : 'X') : mySymbol;
+      document.querySelector('#select-x').classList.remove('selected');
+      document.querySelector('#select-o').classList.remove('selected');
+      symbolModal.classList.remove('hidden');
+    }
+
+    aiModeBtn.addEventListener('click', () => {
+      mainMenu.classList.add('hidden');
+      difficultyMenu.classList.remove('hidden');
+    });
+
+    localModeBtn.addEventListener('click', () => {
+      mySymbol = 'X';
+      showGame('local');
+    });
+
+    onlineModeBtn.addEventListener('click', () => showGame('online'));
+
+    document.querySelectorAll('.difficulty-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        aiDifficulty = button.dataset.difficulty;
+        showSymbolSelection('ai');
       });
-
-      setupDataListener();
     });
 
-    // 3. Outgoing Connection (Joiner)
+    function chooseSymbol(symbol) {
+      mySymbol = pendingMode === 'online-rematch'
+        ? (mySymbol === 'X' ? 'O' : 'X')
+        : symbol;
+      symbolModal.classList.add('hidden');
+      if (pendingMode === 'online' && conn && isOnlineHost) {
+        sendOnlineInit();
+        setupGame();
+      } else if (pendingMode === 'online-rematch' && conn && isOnlineHost) {
+        onlineRound += 1;
+        sendOnlineInit();
+        resetLocalBoard();
+      } else {
+        showGame(pendingMode);
+      }
+    }
+
+    document.querySelector('#select-x').addEventListener('click', () => {
+      pendingSymbol = 'X';
+      chooseSymbol('X');
+    });
+
+    document.querySelector('#select-o').addEventListener('click', () => {
+      pendingSymbol = 'O';
+      chooseSymbol('O');
+    });
+
+    difficultyBackBtn.addEventListener('click', () => {
+      difficultyMenu.classList.add('hidden');
+      mainMenu.classList.remove('hidden');
+    });
+
+    menuBtn.addEventListener('click', () => {
+      clearTimeout(aiTimer);
+      running = false;
+      if (peer) peer.destroy();
+      peer = null;
+      conn = null;
+      connectBtn.disabled = false;
+      mainMenu.classList.remove('hidden');
+      symbolModal.classList.add('hidden');
+      gameScreen.classList.add('hidden');
+      resetLocalBoard();
+    });
+
+    // Create a peer whose public ID is the username, then host or join.
     connectBtn.addEventListener('click', () => {
       const targetId = joinInput.value.trim();
-      if (!targetId) return;
 
-      conn = peer.connect(targetId);
-      setupDataListener();
+      connectBtn.disabled = true;
+      myIdDisplay.textContent = playerName;
+      peer = new Peer(playerName);
+
+      peer.on('open', () => {
+        if (targetId) {
+          statusText.textContent = `Connecting to ${targetId}...`;
+          conn = peer.connect(targetId);
+          conn.on('open', () => conn.send({ type: 'hello', name: playerName }));
+          setupDataListener();
+        } else {
+          statusText.textContent = `Ready. Share "${playerName}" with your friend.`;
+        }
+      });
+
+      peer.on('connection', (connection) => {
+        conn = connection;
+        isOnlineHost = true;
+
+        conn.on('open', () => {});
+
+        setupDataListener();
+      });
+
+      peer.on('error', (error) => {
+        connectBtn.disabled = false;
+        statusText.textContent = error.type === 'unavailable-id'
+          ? 'That username is already in use. Choose another.'
+          : `Connection error: ${error.type}`;
+      });
     });
 
     function setupGame() {
       running = true;
       restartBtn.disabled = false;
       updateStatusText();
-      cells.forEach(cell => cell.addEventListener('click', cellClicked));
     }
+
+    cells.forEach(cell => cell.addEventListener('click', cellClicked));
 
     // 4. Data Listener for P2P Messages
     function setupDataListener() {
       conn.on('data', (data) => {
-        if (data.type === 'init') {
+        if (data.type === 'hello') {
+          opponentName = data.name;
+          statusText.textContent = `${opponentName} joined the game.`;
+          showSymbolSelection(onlineRound ? 'online-rematch' : 'online');
+        } else if (data.type === 'init') {
           mySymbol = data.joinerSymbol;
-          setTeam(mySymbol);
+          opponentName = data.hostName;
+          isOnlineHost = false;
+          resetLocalBoard();
           setupGame();
         } else if (data.type === 'move') {
           updateCell(data.index, data.player);
@@ -262,14 +583,22 @@
 
     function cellClicked() {
       const index = this.getAttribute('data-index');
+      const player = gameMode === 'local' ? currentPlayer : mySymbol;
 
-      if (options[index] !== "" || !running || currentPlayer !== mySymbol) {
+      if (options[index] !== "" || !running || (gameMode !== 'local' && currentPlayer !== mySymbol)) {
         return;
       }
 
-      updateCell(index, mySymbol);
-      conn.send({ type: 'move', index: index, player: mySymbol });
+      updateCell(index, player);
+      if (gameMode === 'online' && conn) {
+        conn.send({ type: 'move', index: index, player });
+      }
       checkWinner();
+
+      const aiSymbol = mySymbol === 'X' ? 'O' : 'X';
+      if (gameMode === 'ai' && running && currentPlayer === aiSymbol) {
+        aiTimer = setTimeout(aiMove, 350);
+      }
     }
 
     function updateCell(index, player) {
@@ -281,6 +610,12 @@
 
     function updateStatusText() {
       if (!running) return;
+      if (gameMode === 'local') {
+        statusText.textContent = currentPlayer === mySymbol
+          ? `${playerName}'s Turn (${mySymbol})`
+          : `Player 2's Turn (${currentPlayer})`;
+        return;
+      }
       if (currentPlayer === mySymbol) {
         statusText.textContent = `Your Turn (${mySymbol})`;
       } else {
@@ -300,7 +635,8 @@
       }
 
       if (roundWon) {
-        statusText.textContent = currentPlayer === mySymbol ? "🎉 You Win!" : "❌ You Lose!";
+        const winner = currentPlayer === mySymbol ? playerName : (gameMode === 'ai' ? 'AI' : gameMode === 'local' ? 'Player 2' : opponentName || 'Opponent');
+        statusText.textContent = `${winner} Wins🎉!`;
         running = false;
       } else if (!options.includes("")) {
         statusText.textContent = "🤝 It's a Draw!";
@@ -311,23 +647,98 @@
       }
     }
 
-    // 5. Restart Logic
     restartBtn.addEventListener('click', () => {
+      if (gameMode === 'online' && conn) {
+        if (isOnlineHost) {
+          showSymbolSelection('online-rematch');
+        }
+        return;
+      }
+      if (gameMode === 'ai') {
+        showSymbolSelection('ai');
+        return;
+      }
       resetLocalBoard();
       if (conn) {
         conn.send({ type: 'restart' });
       }
     });
 
+    function sendOnlineInit() {
+      const joinerSymbol = mySymbol === 'X' ? 'O' : 'X';
+      conn.send({ type: 'init', hostSymbol: mySymbol, joinerSymbol, hostName: playerName });
+    }
+
     function resetLocalBoard() {
       options = ["", "", "", "", "", "", "", "", ""];
       currentPlayer = "X";
-      running = true;
+      running = gameMode !== 'online' || Boolean(conn);
       cells.forEach(cell => {
         cell.textContent = "";
         cell.classList.remove('x', 'o');
       });
       updateStatusText();
+    }
+
+    function aiMove() {
+      const aiSymbol = mySymbol === 'X' ? 'O' : 'X';
+      if (!running || gameMode !== 'ai' || currentPlayer !== aiSymbol) return;
+      const move = chooseAiMove();
+      if (move === -1) return;
+      updateCell(move, aiSymbol);
+      checkWinner();
+    }
+
+    function chooseAiMove() {
+      const aiSymbol = mySymbol === 'X' ? 'O' : 'X';
+      const humanSymbol = mySymbol;
+      const available = options.map((value, index) => value === '' ? index : -1).filter(index => index !== -1);
+      if (aiDifficulty === 'easy') {
+        return available[Math.floor(Math.random() * available.length)];
+      }
+
+      const winningMove = findTacticalMove(aiSymbol);
+      if (winningMove !== -1) return winningMove;
+      const blockingMove = findTacticalMove(humanSymbol);
+      if (blockingMove !== -1) return blockingMove;
+      if (aiDifficulty === 'medium') {
+        return available[Math.floor(Math.random() * available.length)];
+      }
+      return minimax(options.slice(), aiSymbol, humanSymbol).index;
+    }
+
+    function findTacticalMove(player) {
+      for (const index of options.keys()) {
+        if (options[index] !== '') continue;
+        options[index] = player;
+        const wins = hasWinner(player);
+        options[index] = '';
+        if (wins) return index;
+      }
+      return -1;
+    }
+
+    function hasWinner(player) {
+      return winConditions.some(([a, b, c]) => options[a] === player && options[b] === player && options[c] === player);
+    }
+
+    function minimax(board, player, aiSymbol, humanSymbol) {
+      const available = board.map((value, index) => value === '' ? index : -1).filter(index => index !== -1);
+      if (winConditions.some(([a, b, c]) => board[a] === aiSymbol && board[b] === aiSymbol && board[c] === aiSymbol)) return { score: 10 };
+      if (winConditions.some(([a, b, c]) => board[a] === humanSymbol && board[b] === humanSymbol && board[c] === humanSymbol)) return { score: -10 };
+      if (available.length === 0) return { score: 0 };
+
+      const moves = [];
+      available.forEach(index => {
+        board[index] = player;
+        const result = minimax(board, player === aiSymbol ? humanSymbol : aiSymbol, aiSymbol, humanSymbol);
+        moves.push({ index, score: result.score });
+        board[index] = '';
+      });
+
+      return player === aiSymbol
+        ? moves.reduce((best, move) => move.score > best.score ? move : best)
+        : moves.reduce((best, move) => move.score < best.score ? move : best);
     }
   </script>
 </body>
