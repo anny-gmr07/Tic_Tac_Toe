@@ -92,6 +92,25 @@
       background: rgba(15, 23, 42, 0.9);
     }
 
+    #invite-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .invite-card { width: min(420px, 100%); }
+
+    .invite-card h2 { margin-top: 0; }
+
+    .invite-actions { display: flex; gap: 12px; }
+
+    .invite-actions button { flex: 1; }
+
     .symbol-card { width: min(420px, 100%); }
 
     .symbol-card h2 { margin-top: 0; }
@@ -304,6 +323,17 @@
     </div>
   </section>
 
+  <section class="hidden" id="invite-modal">
+    <div class="card menu-card invite-card">
+      <h2>Game request</h2>
+      <p><strong id="invite-username"></strong> wants to play with you.</p>
+      <div class="invite-actions">
+        <button class="primary-btn" id="accept-invite-btn">Accept</button>
+        <button class="secondary-btn" id="decline-invite-btn">Decline</button>
+      </div>
+    </div>
+  </section>
+
   <section class="card menu-card hidden" id="difficulty-menu">
     <h2>Choose difficulty</h2>
     <button class="secondary-btn difficulty-btn" data-difficulty="easy">Easy</button>
@@ -352,6 +382,10 @@
     const confirmNameBtn = document.querySelector('#confirm-name-btn');
     const usernameDisplay = document.querySelector('#username-display');
     const symbolModal = document.querySelector('#symbol-modal');
+    const inviteModal = document.querySelector('#invite-modal');
+    const inviteUsername = document.querySelector('#invite-username');
+    const acceptInviteBtn = document.querySelector('#accept-invite-btn');
+    const declineInviteBtn = document.querySelector('#decline-invite-btn');
     const menuBtn = document.querySelector('#menuBtn');
     const difficultyBackBtn = document.querySelector('#difficulty-back-btn');
     const aiModeBtn = document.querySelector('#ai-mode-btn');
@@ -387,6 +421,7 @@
     let pendingSymbol = 'X';
     let isOnlineHost = false;
     let onlineRound = 0;
+    let pendingInviteName = '';
 
     playerNameInput.value = playerName;
     confirmNameBtn.disabled = identityConfirmed;
@@ -470,6 +505,23 @@
 
     onlineModeBtn.addEventListener('click', () => showGame('online'));
 
+    acceptInviteBtn.addEventListener('click', () => {
+      inviteModal.classList.add('hidden');
+      friendStatus.textContent = pendingInviteName;
+      showSymbolSelection(onlineRound ? 'online-rematch' : 'online');
+    });
+
+    declineInviteBtn.addEventListener('click', () => {
+      if (conn) conn.send({ type: 'invite-declined' });
+      if (conn) conn.close();
+      conn = null;
+      isOnlineHost = false;
+      pendingInviteName = '';
+      inviteModal.classList.add('hidden');
+      friendStatus.textContent = 'Not connected';
+      statusText.textContent = 'Game request declined.';
+    });
+
     document.querySelectorAll('.difficulty-btn').forEach(button => {
       button.addEventListener('click', () => {
         aiDifficulty = button.dataset.difficulty;
@@ -518,6 +570,7 @@
       connectBtn.disabled = false;
       mainMenu.classList.remove('hidden');
       symbolModal.classList.add('hidden');
+      inviteModal.classList.add('hidden');
       gameScreen.classList.add('hidden');
       resetLocalBoard();
     });
@@ -571,9 +624,10 @@
       conn.on('data', (data) => {
         if (data.type === 'hello') {
           opponentName = data.name;
-          friendStatus.textContent = opponentName;
-          statusText.textContent = `${opponentName} joined the game.`;
-          showSymbolSelection(onlineRound ? 'online-rematch' : 'online');
+          pendingInviteName = opponentName;
+          inviteUsername.textContent = opponentName;
+          statusText.textContent = 'New game request received.';
+          inviteModal.classList.remove('hidden');
         } else if (data.type === 'init') {
           mySymbol = data.joinerSymbol;
           opponentName = data.hostName;
@@ -586,6 +640,10 @@
           checkWinner();
         } else if (data.type === 'restart') {
           resetLocalBoard();
+        } else if (data.type === 'invite-declined') {
+          conn = null;
+          friendStatus.textContent = 'Not connected';
+          statusText.textContent = 'Game request declined.';
         }
       });
     }
