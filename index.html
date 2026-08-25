@@ -14,6 +14,58 @@
       --accent-o: #00d2d3;
       --button-bg: #3b82f6;
       --button-hover: #2563eb;
+      --muted: #cbd5e1;
+      --input-bg: #0f172a;
+      --surface-alt: #334155;
+      --surface-hover: #475569;
+      --overlay: rgba(15, 23, 42, 0.9);
+    }
+
+    :root[data-theme="light"] {
+      --bg: #eef2f7;
+      --card-bg: #ffffff;
+      --text: #172033;
+      --accent-x: #dc2626;
+      --accent-o: #0891b2;
+      --button-bg: #2563eb;
+      --button-hover: #1d4ed8;
+      --muted: #526075;
+      --input-bg: #f8fafc;
+      --surface-alt: #dbe4f0;
+      --surface-hover: #cbd5e1;
+      --overlay: rgba(226, 232, 240, 0.9);
+    }
+
+    :root[data-theme="light"] .username-display { color: #000000; }
+
+    :root[data-theme="dark"] {
+      --bg: #050505;
+      --card-bg: #171717;
+      --text: #f5f5f5;
+      --accent-x: #fb7185;
+      --accent-o: #22d3ee;
+      --button-bg: #404040;
+      --button-hover: #525252;
+      --muted: #a3a3a3;
+      --input-bg: #0a0a0a;
+      --surface-alt: #262626;
+      --surface-hover: #404040;
+      --overlay: rgba(0, 0, 0, 0.9);
+    }
+
+    :root[data-theme="orange"] {
+      --bg: #21140d;
+      --card-bg: #3b2114;
+      --text: #fff7ed;
+      --accent-x: #fb7185;
+      --accent-o: #67e8f9;
+      --button-bg: #ea580c;
+      --button-hover: #c2410c;
+      --muted: #fed7aa;
+      --input-bg: #29170e;
+      --surface-alt: #6b3418;
+      --surface-hover: #8a431c;
+      --overlay: rgba(33, 20, 13, 0.9);
     }
 
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
@@ -50,7 +102,7 @@
 
     .menu-card h2 { margin: 0 0 4px; font-size: 1.35rem; }
 
-    .menu-card p { margin: 0 0 8px; color: #cbd5e1; font-size: 0.95rem; }
+    .menu-card p { margin: 0 0 8px; color: var(--muted); font-size: 0.95rem; }
 
     .hidden { display: none !important; }
 
@@ -71,8 +123,8 @@
       display: block;
       padding: 10px;
       color: #ffffff;
-      background: #0f172a;
-      border: 1px solid #475569;
+      background: var(--input-bg);
+      border: 1px solid var(--surface-hover);
       border-radius: 6px;
       cursor: pointer;
       font-size: 1.2rem;
@@ -89,7 +141,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(15, 23, 42, 0.9);
+      background: var(--overlay);
     }
 
     #invite-modal {
@@ -100,7 +152,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(15, 23, 42, 0.9);
+      background: var(--overlay);
     }
 
     .invite-card { width: min(420px, 100%); }
@@ -121,7 +173,7 @@
       flex: 1;
       height: 110px;
       color: var(--text);
-      background: #334155;
+      background: var(--surface-alt);
       border: 3px solid transparent;
       border-radius: 8px;
       font-size: 3.5rem;
@@ -129,7 +181,7 @@
       cursor: pointer;
     }
 
-    .symbol-option.selected { border-color: var(--button-bg); background: #475569; }
+    .symbol-option.selected { border-color: var(--button-bg); background: var(--surface-hover); }
 
     .symbol-option:first-child { color: var(--accent-x); }
     .symbol-option:last-child { color: var(--accent-o); }
@@ -156,12 +208,37 @@
 
     .secondary-btn:hover { background: var(--button-hover); }
 
+    #theme-picker {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      color: var(--text);
+      background: var(--card-bg);
+      border: 1px solid var(--surface-hover);
+      border-radius: 6px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+      font-size: 0.85rem;
+    }
+
+    #theme-picker select {
+      padding: 5px 6px;
+      color: var(--text);
+      background: var(--input-bg);
+      border: 1px solid var(--surface-hover);
+      border-radius: 4px;
+    }
+
     .back-btn {
       margin-top: 12px;
       padding: 8px 16px;
-      color: #cbd5e1;
+      color: var(--muted);
       background: transparent;
-      border: 1px solid #475569;
+      border: 1px solid var(--surface-hover);
       border-radius: 6px;
       cursor: pointer;
     }
@@ -175,7 +252,7 @@
 
     .team-btn {
       padding: 6px 16px;
-      background: #334155;
+      background: var(--surface-alt);
       border: 2px solid transparent;
       color: var(--text);
       font-weight: bold;
@@ -185,15 +262,15 @@
 
     .team-btn.selected {
       border-color: var(--button-bg);
-      background: #475569;
+      background: var(--surface-hover);
     }
 
     input {
       width: 100%;
       padding: 10px;
       font-size: 0.95rem;
-      border: 1px solid #475569;
-      background: #0f172a;
+      border: 1px solid var(--surface-hover);
+      background: var(--input-bg);
       color: var(--text);
       border-radius: 6px;
       margin: 10px 0;
@@ -229,7 +306,7 @@
       grid-template-columns: repeat(3, 100px);
       grid-template-rows: repeat(3, 100px);
       gap: 8px;
-      background: #334155;
+      background: var(--surface-alt);
       padding: 8px;
       border-radius: 12px;
     }
@@ -247,7 +324,7 @@
       transition: background-color 0.2s;
     }
 
-    .cell:hover { background-color: #334155; }
+    .cell:hover { background-color: var(--surface-alt); }
     .cell.x { color: var(--accent-x); }
     .cell.o { color: var(--accent-o); }
 
@@ -293,7 +370,7 @@
       border-radius: 2px;
     }
 
-    #menuBtn:hover { background: #334155; }
+    #menuBtn:hover { background: var(--surface-alt); }
   </style>
 </head>
 <body>
@@ -308,9 +385,18 @@
       <input type="text" id="player-name" placeholder="Your username" maxlength="20" autocomplete="nickname">
       <button class="primary-btn name-confirm-btn" id="confirm-name-btn" aria-label="Confirm username" title="Confirm username">&#10003;</button>
     </div>
-    <button class="primary-btn" id="ai-mode-btn">1v1 AI</button>
-    <button class="secondary-btn" id="local-mode-btn">1v1 Local</button>
-    <button class="secondary-btn" id="online-mode-btn">1v1 Online</button>
+    <button class="primary-btn" id="ai-mode-btn">1v1 AI 🤖</button>
+    <button class="secondary-btn" id="local-mode-btn">1v1 Local 🕹️</button>
+    <button class="secondary-btn" id="online-mode-btn">1v1 Online 🌐</button>
+    <div id="theme-picker">
+      <label for="theme-select">Theme</label>
+      <select id="theme-select">
+        <option value="blue">Magnificent Blue</option>
+        <option value="light">Normal Light</option>
+        <option value="dark">Normal Dark</option>
+        <option value="orange">Attractive Orange</option>
+      </select>
+    </div>
   </section>
 
   <section class="hidden" id="symbol-modal">
@@ -391,6 +477,7 @@
     const aiModeBtn = document.querySelector('#ai-mode-btn');
     const localModeBtn = document.querySelector('#local-mode-btn');
     const onlineModeBtn = document.querySelector('#online-mode-btn');
+    const themeSelect = document.querySelector('#theme-select');
     const cells = document.querySelectorAll('.cell');
     const statusText = document.querySelector('#status');
     const myIdDisplay = document.querySelector('#my-id');
@@ -422,6 +509,14 @@
     let isOnlineHost = false;
     let onlineRound = 0;
     let pendingInviteName = '';
+    const savedTheme = localStorage.getItem('tttTheme') || 'blue';
+
+    document.documentElement.dataset.theme = savedTheme;
+    themeSelect.value = savedTheme;
+    themeSelect.addEventListener('change', () => {
+      document.documentElement.dataset.theme = themeSelect.value;
+      localStorage.setItem('tttTheme', themeSelect.value);
+    });
 
     playerNameInput.value = playerName;
     confirmNameBtn.disabled = identityConfirmed;
