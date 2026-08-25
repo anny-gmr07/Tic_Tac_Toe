@@ -68,6 +68,21 @@
       --overlay: rgba(33, 20, 13, 0.9);
     }
 
+    :root[data-theme="lavender"] {
+      --bg: #211a32;
+      --card-bg: #33264d;
+      --text: #faf5ff;
+      --accent-x: #fb7185;
+      --accent-o: #67e8f9;
+      --button-bg: #8b5cf6;
+      --button-hover: #7c3aed;
+      --muted: #ddd6fe;
+      --input-bg: #261d3a;
+      --surface-alt: #4c3970;
+      --surface-hover: #614b89;
+      --overlay: rgba(33, 26, 50, 0.9);
+    }
+
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     
     body {
@@ -395,6 +410,7 @@
         <option value="light">Normal Light</option>
         <option value="dark">Normal Dark</option>
         <option value="orange">Attractive Orange</option>
+        <option value="lavender">Gracious Lavender</option>
       </select>
     </div>
   </section>
@@ -509,6 +525,7 @@
     let isOnlineHost = false;
     let onlineRound = 0;
     let pendingInviteName = '';
+    let pendingTargetId = '';
     const savedTheme = localStorage.getItem('tttTheme') || 'blue';
 
     document.documentElement.dataset.theme = savedTheme;
@@ -670,40 +687,76 @@
       resetLocalBoard();
     });
 
-    // Create a peer whose public ID is the username, then host or join.
-    connectBtn.addEventListener('click', () => {
-      const targetId = joinInput.value.trim();
+    function attachConnection(connection, host) {
+      conn = connection;
+      isOnlineHost = host;
+      setupDataListener();
+      conn.on('open', () => {
+        connectBtn.disabled = false;
+        restartBtn.disabled = false;
+        if (!host) conn.send({ type: 'hello', name: playerName });
+      });
+      conn.on('error', () => {
+        if (conn === connection) {
+          conn = null;
+          friendStatus.textContent = 'Not connected';
+          connectBtn.disabled = false;
+          restartBtn.disabled = true;
+          statusText.textContent = 'Connection failed. Try again.';
+        }
+      });
+      conn.on('close', () => {
+        if (conn === connection) {
+          conn = null;
+          friendStatus.textContent = 'Not connected';
+          restartBtn.disabled = true;
+          statusText.textContent = 'Friend disconnected. You can try again.';
+        }
+      });
+    }
 
-      connectBtn.disabled = true;
-      myIdDisplay.textContent = playerName;
+    function connectToFriend(targetId) {
+      if (!peer || !peer.open || conn) return;
+      pendingTargetId = targetId;
+      statusText.textContent = `Connecting to ${targetId}...`;
+      attachConnection(peer.connect(targetId), false);
+    }
+
+    function createOnlinePeer() {
       peer = new Peer(playerName);
 
       peer.on('open', () => {
-        if (targetId) {
-          statusText.textContent = `Connecting to ${targetId}...`;
-          conn = peer.connect(targetId);
-          conn.on('open', () => conn.send({ type: 'hello', name: playerName }));
-          setupDataListener();
+        connectBtn.disabled = false;
+        if (pendingTargetId) connectToFriend(pendingTargetId);
+        else statusText.textContent = `Ready. Share "${playerName}" with your friend.`;
+      });
+
+      peer.on('connection', connection => attachConnection(connection, true));
+
+      peer.on('error', error => {
+        connectBtn.disabled = false;
+        if (error.type === 'unavailable-id') {
+          peer.destroy();
+          peer = null;
+          statusText.textContent = 'That username is already in use. Choose another.';
         } else {
-          statusText.textContent = `Ready. Share "${playerName}" with your friend.`;
+          statusText.textContent = `Connection error: ${error.type}. Try again.`;
         }
       });
+    }
 
-      peer.on('connection', (connection) => {
-        conn = connection;
-        isOnlineHost = true;
-
-        conn.on('open', () => {});
-
-        setupDataListener();
-      });
-
-      peer.on('error', (error) => {
+    // Register the username once, then reuse that peer for retries.
+    connectBtn.addEventListener('click', () => {
+      const targetId = joinInput.value.trim();
+      connectBtn.disabled = true;
+      myIdDisplay.textContent = playerName;
+      pendingTargetId = targetId;
+      if (!peer) createOnlinePeer();
+      else if (peer.open && targetId) connectToFriend(targetId);
+      else if (peer.open) {
         connectBtn.disabled = false;
-        statusText.textContent = error.type === 'unavailable-id'
-          ? 'That username is already in use. Choose another.'
-          : `Connection error: ${error.type}`;
-      });
+        statusText.textContent = `Ready. Share "${playerName}" with your friend.`;
+      }
     });
 
     function setupGame() {
